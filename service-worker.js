@@ -2,7 +2,7 @@ const AI_CONFIG_KEY = "pageFlowAiConfig";
 
 const SYSTEM_PROMPT = `You are an accessibility-focused webpage customization engine.
 Return only a JSON object containing any of these fields:
-theme: "original" | "warm" | "dark" | "contrast"
+theme: "original" | "warm" | "contrast"
 hideImages, grayscaleImages, readableFont, underlineLinks, reduceMotion, focusMode: boolean
 fontScale: number from 80 to 160
 lineHeight: number from 1.2 to 2.2

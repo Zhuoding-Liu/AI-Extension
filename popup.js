@@ -79,7 +79,6 @@ function localPromptToPatch(text) {
   const patch = {};
   const has = (...words) => words.some((word) => value.includes(word));
 
-  if (has("dark", "night")) patch.theme = "dark";
   if (has("warm", "soft colors", "sepia")) patch.theme = "warm";
   if (has("high contrast", "contrast")) patch.theme = "contrast";
   if (has("original color", "reset colors")) patch.theme = "original";

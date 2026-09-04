@@ -15,7 +15,7 @@ const DEFAULT_STATE = Object.freeze({
   readingWidth: 0
 });
 
-const ALLOWED_THEMES = new Set(["original", "warm", "dark", "contrast"]);
+const ALLOWED_THEMES = new Set(["original", "warm", "contrast"]);
 let currentState = { ...DEFAULT_STATE };
 
 function clamp(value, min, max, fallback) {
@@ -89,20 +89,6 @@ function ensureStyles() {
       filter: grayscale(1) !important;
     }
 
-    html.pageflow-dark img,
-    html.pageflow-dark picture,
-    html.pageflow-dark video,
-    html.pageflow-dark canvas,
-    html.pageflow-dark svg,
-    html.pageflow-dark [style*="background-image"] {
-      filter: invert(1) hue-rotate(180deg) !important;
-    }
-
-    html.pageflow-dark.pageflow-grayscale-images img,
-    html.pageflow-dark.pageflow-grayscale-images picture,
-    html.pageflow-dark.pageflow-grayscale-images video {
-      filter: invert(1) hue-rotate(180deg) grayscale(1) !important;
-    }
 
     html.pageflow-warm body {
       background-color: #fffaf0 !important;
@@ -141,7 +127,6 @@ function themeFilter(state) {
   const themeFilters = {
     original: "",
     warm: "sepia(0.18)",
-    dark: "invert(0.92) hue-rotate(180deg)",
     contrast: "contrast(1.32)"
   };
   const filters = [
@@ -162,7 +147,6 @@ function applyState(nextState) {
     "pageflow-line-height",
     "pageflow-filter",
     "pageflow-warm",
-    "pageflow-dark",
     "pageflow-readable-font",
     "pageflow-underlined-links",
     "pageflow-hide-images",
@@ -177,7 +161,6 @@ function applyState(nextState) {
   root.classList.toggle("pageflow-line-height", currentState.lineHeight !== DEFAULT_STATE.lineHeight);
   root.classList.toggle("pageflow-filter", themeFilter(currentState) !== "none");
   root.classList.toggle("pageflow-warm", currentState.theme === "warm");
-  root.classList.toggle("pageflow-dark", currentState.theme === "dark");
   root.classList.toggle("pageflow-readable-font", currentState.readableFont);
   root.classList.toggle("pageflow-underlined-links", currentState.underlineLinks);
   root.classList.toggle("pageflow-hide-images", currentState.hideImages);

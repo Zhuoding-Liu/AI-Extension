@@ -4,7 +4,7 @@ A build-free Chrome / Edge Manifest V3 extension for customizing webpage appeara
 
 ## Features
 
-- Original, warm, dark, and high-contrast page themes
+- Original, warm, and high-contrast page themes
 - One-click image hiding, grayscale images, readable fonts, and highlighted links
 - Reading focus, reduced motion, text size, line spacing, saturation, brightness, and reading width
 - Per-website settings with one-click reset
