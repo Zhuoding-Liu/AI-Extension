@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PageFlow AI 设置</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <a class="brand" href="#"><span>PF</span> PageFlow AI</a>
+      <section class="panel">
+        <p class="eyebrow">AI INTEGRATION</p>
+        <h1>连接你的 AI 服务</h1>
+        <p class="intro">插件支持 OpenAI Chat Completions 兼容格式。未配置时，弹窗中的自然语言输入会自动使用本地规则。</p>
+
+        <form id="aiForm">
+          <label>API 地址<input id="endpoint" type="url" placeholder="https://your-proxy.example.com/v1/chat/completions" /></label>
+          <label>模型名称<input id="model" type="text" placeholder="例如：your-model-name" /></label>
+          <label>API 密钥（开发测试用）<input id="apiKey" type="password" autocomplete="off" placeholder="可留空，由服务端代理鉴权" /></label>
+          <div class="notice"><b>生产环境建议</b><p>请使用自己的后端代理保存密钥。浏览器扩展中的本地密钥能够被设备使用者读取，不适合分发给最终用户。</p></div>
+          <div class="actions"><button type="button" id="clear">清除配置</button><button type="submit">保存并授权</button></div>
+        </form>
+        <p id="status" role="status"></p>
+      </section>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

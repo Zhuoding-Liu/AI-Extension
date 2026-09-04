@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PageFlow AI</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <h1>PageFlow <em>AI</em></h1>
+          <p id="siteName">正在连接当前页面…</p>
+        </div>
+        <button id="resetButton" class="icon-button" title="恢复当前网站" aria-label="恢复当前网站">↺</button>
+      </header>
+
+      <section class="ai-card" aria-labelledby="aiTitle">
+        <div class="section-heading">
+          <div><span class="spark">✦</span><h2 id="aiTitle">描述你想要的页面</h2></div>
+          <span class="local-pill" id="aiMode">本地规则</span>
+        </div>
+        <div class="prompt-row">
+          <textarea id="aiPrompt" rows="2" placeholder="例如：字体大一点，隐藏图片，使用护眼配色"></textarea>
+          <button id="applyPrompt" class="send-button" aria-label="应用智能设置">→</button>
+        </div>
+        <p class="hint" id="promptHint">支持自然语言快捷调整；可在设置中连接兼容 API。</p>
+      </section>
+
+      <section aria-labelledby="themeTitle">
+        <div class="section-heading compact">
+          <h2 id="themeTitle">页面氛围</h2>
+        </div>
+        <div class="theme-grid" role="group" aria-label="页面配色">
+          <button class="theme-button active" data-theme="original"><span class="theme-swatch original"></span><b>原始</b></button>
+          <button class="theme-button" data-theme="warm"><span class="theme-swatch warm"></span><b>护眼</b></button>
+          <button class="theme-button" data-theme="dark"><span class="theme-swatch dark"></span><b>深色</b></button>
+          <button class="theme-button" data-theme="contrast"><span class="theme-swatch contrast"></span><b>高对比</b></button>
+        </div>
+      </section>
+
+      <section class="control-card" aria-labelledby="displayTitle">
+        <div class="section-heading compact"><h2 id="displayTitle">显示与阅读</h2></div>
+        <div class="switch-grid">
+          <label class="switch-row"><span><i>▧</i><b>隐藏图片</b><small>专注文字内容</small></span><input type="checkbox" data-key="hideImages" /><u></u></label>
+          <label class="switch-row"><span><i>◐</i><b>图片灰度</b><small>降低视觉干扰</small></span><input type="checkbox" data-key="grayscaleImages" /><u></u></label>
+          <label class="switch-row"><span><i>Aa</i><b>易读字体</b><small>统一清晰字形</small></span><input type="checkbox" data-key="readableFont" /><u></u></label>
+          <label class="switch-row"><span><i>↗</i><b>突出链接</b><small>链接添加下划线</small></span><input type="checkbox" data-key="underlineLinks" /><u></u></label>
+          <label class="switch-row"><span><i>◎</i><b>阅读聚焦</b><small>弱化页面边栏</small></span><input type="checkbox" data-key="focusMode" /><u></u></label>
+          <label class="switch-row"><span><i>≋</i><b>减少动画</b><small>避免动态干扰</small></span><input type="checkbox" data-key="reduceMotion" /><u></u></label>
+        </div>
+      </section>
+
+      <section class="range-card" aria-label="精细调整">
+        <label class="range-row">
+          <span><b>字体大小</b><output data-output="fontScale">100%</output></span>
+          <input type="range" data-key="fontScale" min="80" max="160" step="5" value="100" />
+        </label>
+        <label class="range-row">
+          <span><b>行间距</b><output data-output="lineHeight">1.6</output></span>
+          <input type="range" data-key="lineHeight" min="1.2" max="2.2" step="0.1" value="1.6" />
+        </label>
+        <label class="range-row">
+          <span><b>页面饱和度</b><output data-output="saturation">100%</output></span>
+          <input type="range" data-key="saturation" min="0" max="200" step="10" value="100" />
+        </label>
+        <label class="range-row">
+          <span><b>页面亮度</b><output data-output="brightness">100%</output></span>
+          <input type="range" data-key="brightness" min="60" max="140" step="5" value="100" />
+        </label>
+        <label class="range-row">
+          <span><b>阅读宽度</b><output data-output="readingWidth">不限</output></span>
+          <input type="range" data-key="readingWidth" min="0" max="1200" step="80" value="0" />
+        </label>
+      </section>
+
+      <footer>
+        <span id="status" role="status">设置仅应用于当前网站</span>
+        <button id="openOptions">AI 接入设置</button>
+      </footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
