@@ -21,14 +21,14 @@ form.addEventListener("submit", async (event) => {
     try {
       originPattern = `${new URL(url).origin}/*`;
     } catch {
-      status.textContent = "请输入有效的 API 地址";
+      status.textContent = "Enter a valid API endpoint.";
       status.style.color = "#c34e4e";
       return;
     }
 
     const granted = await chrome.permissions.request({ origins: [originPattern] });
     if (!granted) {
-      status.textContent = "需要授权该 API 域名才能发送请求";
+      status.textContent = "Permission for this API domain is required to send requests.";
       status.style.color = "#c34e4e";
       return;
     }
@@ -37,7 +37,7 @@ form.addEventListener("submit", async (event) => {
   await chrome.storage.local.set({
     [STORAGE_KEY]: { endpoint: url, model: model.value.trim(), apiKey: apiKey.value.trim() }
   });
-  status.textContent = url ? "配置已保存，可以在插件中使用 AI" : "已保存：继续使用本地规则";
+  status.textContent = url ? "Configuration saved. AI is ready to use." : "Saved. Local rules will remain active.";
   status.style.color = "#3f8a63";
 });
 
@@ -46,7 +46,7 @@ document.getElementById("clear").addEventListener("click", async () => {
   model.value = "";
   apiKey.value = "";
   await chrome.storage.local.set({ [STORAGE_KEY]: { endpoint: "", model: "", apiKey: "" } });
-  status.textContent = "AI 配置已清除";
+  status.textContent = "AI configuration cleared.";
   status.style.color = "#3f8a63";
 });
 

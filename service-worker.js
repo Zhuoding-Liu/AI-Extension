@@ -16,7 +16,7 @@ function extractJson(text) {
   const cleaned = String(text || "").replace(/```(?:json)?|```/gi, "").trim();
   const start = cleaned.indexOf("{");
   const end = cleaned.lastIndexOf("}");
-  if (start < 0 || end <= start) throw new Error("AI 没有返回有效的设置");
+  if (start < 0 || end <= start) throw new Error("The AI did not return valid settings.");
   return JSON.parse(cleaned.slice(start, end + 1));
 }
 
@@ -46,7 +46,7 @@ async function requestAi(prompt, currentState) {
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`API 请求失败（${response.status}）：${detail.slice(0, 160)}`);
+    throw new Error(`API request failed (${response.status}): ${detail.slice(0, 160)}`);
   }
 
   const data = await response.json();

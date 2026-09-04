@@ -29,7 +29,7 @@ function setStatus(message, isError = false) {
 
 function formatValue(key, value) {
   if (["fontScale", "saturation", "brightness"].includes(key)) return `${value}%`;
-  if (key === "readingWidth") return Number(value) === 0 ? "不限" : `${value}px`;
+  if (key === "readingWidth") return Number(value) === 0 ? "Auto" : `${value}px`;
   return Number(value).toFixed(1);
 }
 
@@ -52,7 +52,7 @@ function render(state) {
 }
 
 async function sendToPage(message) {
-  if (!activeTabId) throw new Error("当前页面不可用");
+  if (!activeTabId) throw new Error("The current page is unavailable.");
   return chrome.tabs.sendMessage(activeTabId, message);
 }
 
@@ -61,11 +61,11 @@ async function applyPatch(patch, quiet = false) {
   render(currentState);
   try {
     const response = await sendToPage({ type: "PAGEFLOW_SET_STATE", patch });
-    if (!response?.ok) throw new Error(response?.error || "设置失败");
+    if (!response?.ok) throw new Error(response?.error || "Unable to apply settings.");
     currentState = response.state;
-    if (!quiet) setStatus("已应用到当前网站");
+    if (!quiet) setStatus("Applied to this website.");
   } catch (error) {
-    setStatus(error.message || "无法修改此页面", true);
+    setStatus(error.message || "This page cannot be modified.", true);
   }
 }
 
@@ -79,26 +79,26 @@ function localPromptToPatch(text) {
   const patch = {};
   const has = (...words) => words.some((word) => value.includes(word));
 
-  if (has("深色", "暗色", "夜间", "dark", "night")) patch.theme = "dark";
-  if (has("护眼", "暖色", "柔和", "warm", "sepia")) patch.theme = "warm";
-  if (has("高对比", "对比度", "contrast")) patch.theme = "contrast";
-  if (has("原始配色", "恢复颜色", "original color")) patch.theme = "original";
+  if (has("dark", "night")) patch.theme = "dark";
+  if (has("warm", "soft colors", "sepia")) patch.theme = "warm";
+  if (has("high contrast", "contrast")) patch.theme = "contrast";
+  if (has("original color", "reset colors")) patch.theme = "original";
 
-  if (has("隐藏图片", "不要图片", "无图", "hide image")) patch.hideImages = true;
-  if (has("显示图片", "恢复图片", "show image")) patch.hideImages = false;
-  if (has("图片灰度", "黑白图片", "grayscale")) patch.grayscaleImages = true;
-  if (has("彩色图片", "恢复彩色")) patch.grayscaleImages = false;
-  if (has("易读字体", "清晰字体", "readable font")) patch.readableFont = true;
-  if (has("突出链接", "链接下划线", "underline link")) patch.underlineLinks = true;
-  if (has("减少动画", "关闭动画", "reduce motion")) patch.reduceMotion = true;
-  if (has("聚焦", "专注阅读", "focus")) patch.focusMode = true;
-  if (has("窄一点", "阅读宽度", "窄版")) patch.readingWidth = 720;
-  if (has("全宽", "不限宽", "wide")) patch.readingWidth = 0;
+  if (has("hide image", "hide pictures", "no images")) patch.hideImages = true;
+  if (has("show image", "show pictures", "restore images")) patch.hideImages = false;
+  if (has("grayscale", "black and white images")) patch.grayscaleImages = true;
+  if (has("color images", "restore color")) patch.grayscaleImages = false;
+  if (has("readable font", "clearer font")) patch.readableFont = true;
+  if (has("highlight links", "underline link")) patch.underlineLinks = true;
+  if (has("reduce motion", "disable animation")) patch.reduceMotion = true;
+  if (has("focus", "focus mode")) patch.focusMode = true;
+  if (has("narrow", "reading width")) patch.readingWidth = 720;
+  if (has("full width", "wide")) patch.readingWidth = 0;
 
-  if (has("字体大", "放大字体", "大一点", "larger text", "bigger text")) patch.fontScale = Math.min(160, currentState.fontScale + 20);
-  if (has("字体小", "缩小字体", "smaller text")) patch.fontScale = Math.max(80, currentState.fontScale - 15);
-  if (has("行距大", "宽松", "more spacing")) patch.lineHeight = Math.min(2.2, currentState.lineHeight + 0.3);
-  if (has("低饱和", "减少色彩", "less color")) patch.saturation = 65;
+  if (has("larger text", "bigger text", "increase font")) patch.fontScale = Math.min(160, currentState.fontScale + 20);
+  if (has("smaller text", "decrease font")) patch.fontScale = Math.max(80, currentState.fontScale - 15);
+  if (has("more spacing", "increase line spacing")) patch.lineHeight = Math.min(2.2, currentState.lineHeight + 0.3);
+  if (has("less color", "lower saturation")) patch.saturation = 65;
 
   return patch;
 }
@@ -107,26 +107,26 @@ async function runSmartPrompt() {
   const text = prompt.value.trim();
   if (!text) {
     prompt.focus();
-    setStatus("请先描述你想要的页面", true);
+    setStatus("Describe how you would like the page to look.", true);
     return;
   }
 
   promptButton.disabled = true;
-  setStatus("正在理解你的偏好…");
+  setStatus("Understanding your preferences…");
   try {
     const response = await chrome.runtime.sendMessage({
       type: "PAGEFLOW_AI_REQUEST",
       prompt: text,
       currentState
     });
-    if (!response?.ok) throw new Error(response?.error || "AI 请求失败");
+    if (!response?.ok) throw new Error(response?.error || "The AI request failed.");
 
     const patch = response.configured ? response.patch : localPromptToPatch(text);
     if (!Object.keys(patch || {}).length) {
-      throw new Error(response.configured ? "AI 未返回可用设置" : "暂未识别，请尝试“字体大一点、隐藏图片”");
+      throw new Error(response.configured ? "The AI returned no usable settings." : 'Try a request such as "larger text and hide images."');
     }
     await applyPatch(patch);
-    document.getElementById("aiMode").textContent = response.configured ? "API 智能" : "本地规则";
+    document.getElementById("aiMode").textContent = response.configured ? "AI connected" : "Local rules";
     prompt.value = "";
   } catch (error) {
     setStatus(error.message, true);
@@ -155,9 +155,9 @@ document.querySelectorAll("input[data-key]").forEach((input) => {
 document.getElementById("resetButton").addEventListener("click", async () => {
   try {
     const response = await sendToPage({ type: "PAGEFLOW_RESET" });
-    if (!response?.ok) throw new Error(response?.error || "恢复失败");
+    if (!response?.ok) throw new Error(response?.error || "Unable to reset this website.");
     render(response.state);
-    setStatus("已恢复此网站的默认显示");
+    setStatus("This website has been reset.");
   } catch (error) {
     setStatus(error.message, true);
   }
@@ -176,7 +176,7 @@ document.getElementById("openOptions").addEventListener("click", () => chrome.ru
 async function initialize() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id || !/^https?:/.test(tab.url || "")) {
-    siteName.textContent = "此浏览器页面不支持修改";
+    siteName.textContent = "This browser page cannot be modified";
     document.querySelector("main").classList.add("disabled");
     return;
   }
@@ -184,13 +184,13 @@ async function initialize() {
   activeTabId = tab.id;
   try {
     const response = await sendToPage({ type: "PAGEFLOW_GET_STATE" });
-    if (!response?.ok) throw new Error("连接失败");
+    if (!response?.ok) throw new Error("Connection failed.");
     siteName.textContent = response.site || new URL(tab.url).hostname;
     render(response.state);
-    setStatus("设置仅应用于当前网站");
+    setStatus("Settings apply only to this website.");
   } catch {
-    siteName.textContent = "请刷新页面后再试";
-    setStatus("扩展刚安装时需刷新当前页面", true);
+    siteName.textContent = "Refresh the page and try again";
+    setStatus("Newly installed extensions require a page refresh.", true);
   }
 }
 
