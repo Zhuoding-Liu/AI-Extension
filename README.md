@@ -1,30 +1,139 @@
 # PageFlow AI
 
-A build-free Chrome / Edge Manifest V3 extension for customizing webpage appearance and accessibility. Preferences are saved per website, and an AI-compatible API layer is ready for future customization.
+PageFlow AI is a build-free Chrome and Edge Manifest V3 extension for adjusting webpage appearance and accessibility. It provides reliable one-click controls, per-website preferences, local natural-language shortcuts, and optional integration with an OpenAI Chat Completions-compatible API.
+
+Version: `1.0.0`
 
 ## Features
 
-- Original, warm, and high-contrast page themes
-- One-click image hiding, grayscale images, readable fonts, and highlighted links
-- Reading focus, reduced motion, text size, line spacing, saturation, brightness, and reading width
-- Per-website settings with one-click reset
-- English natural-language shortcuts using local rules
-- Optional Chat Completions-compatible API integration
+- Original, Warm, and Contrast page themes
+- One-click image hiding and grayscale images
+- Readable fonts and highlighted links
+- Reading Focus and Reduced Motion modes
+- Text size, line spacing, saturation, brightness, and reading-width controls
+- Settings saved separately for each website origin
+- One-click website reset
+- English natural-language shortcuts that work without an API
+- Optional GenAI page customization through a Chat Completions-compatible endpoint
 
-## Install and test
+The Dark theme is not included in this version.
+
+## Install the extension
 
 1. Open `chrome://extensions/` in Chrome or `edge://extensions/` in Edge.
 2. Enable **Developer mode**.
-3. Click **Load unpacked** and select this `AI-Extension` directory.
-4. Open and refresh a regular webpage, then click PageFlow AI in the browser toolbar.
+3. Click **Load unpacked**.
+4. Select the `AI-Extension-Development` directory.
+5. Open or refresh a regular HTTP or HTTPS webpage.
+6. Click the PageFlow AI icon in the browser toolbar.
 
-After changing the code, click **Reload** for the extension and refresh the webpage you are testing.
+After editing the extension code, click **Reload** on the extension management page and refresh the webpage being tested.
 
-## AI integration
+Browser-internal pages such as `chrome://extensions/` and browser extension stores cannot be modified by the extension.
 
-Click **AI settings** at the bottom of the popup and enter an endpoint that supports the OpenAI Chat Completions request and response format. Use your own backend proxy to keep provider credentials secure. Saving an API key directly in the extension is suitable only for personal development because users of the device can read extension storage.
+## Use quick controls
 
-The AI response should contain a JSON object such as:
+All buttons, switches, and sliders work without an API configuration.
+
+The prompt field also supports local English commands such as:
+
+```text
+Make the text larger and hide images.
+```
+
+```text
+Use warm colors and reduce motion.
+```
+
+```text
+Use a narrow reading width.
+```
+
+When no API endpoint is configured, the popup displays **Local rules**. These commands are matched against built-in keywords and do not contact a GenAI service.
+
+## Connect a GenAI service
+
+Click **AI settings** at the bottom of the popup. The current development version accepts an endpoint using the OpenAI Chat Completions request and response format.
+
+### Direct OpenAI connection for personal testing
+
+Enter the following values:
+
+```text
+API endpoint:
+https://api.openai.com/v1/chat/completions
+```
+
+```text
+Model name:
+A Chat Completions-compatible model available to your OpenAI account
+```
+
+```text
+API key:
+Your personal development API key
+```
+
+Click **Save and authorize**, then approve the browser permission request for the API origin.
+
+Open a regular webpage, refresh it, and open PageFlow AI. Enter a page-customization request in the **Describe your ideal page** field and press Enter or click the send button.
+
+For example:
+
+```text
+Increase the text size, improve line spacing, and hide images.
+```
+
+If the request succeeds, the popup displays **AI connected** and applies the returned settings immediately.
+
+The current version is a page-customization command interface rather than a general-purpose chatbot. It does not maintain multi-turn conversation history.
+
+See the official [OpenAI Chat Completions API reference](https://developers.openai.com/api/reference/chat/completions/create) for the request format and the [OpenAI API authentication reference](https://developers.openai.com/api/reference/overview) for credential guidance.
+
+## Supported AI settings
+
+The GenAI service can return only the following page settings:
+
+| Setting | Type | Allowed values |
+| --- | --- | --- |
+| `theme` | string | `original`, `warm`, `contrast` |
+| `hideImages` | boolean | `true` or `false` |
+| `grayscaleImages` | boolean | `true` or `false` |
+| `readableFont` | boolean | `true` or `false` |
+| `underlineLinks` | boolean | `true` or `false` |
+| `reduceMotion` | boolean | `true` or `false` |
+| `focusMode` | boolean | `true` or `false` |
+| `fontScale` | number | 80–160 |
+| `lineHeight` | number | 1.2–2.2 |
+| `saturation` | number | 0–200 |
+| `brightness` | number | 60–140 |
+| `readingWidth` | number | 0 or 480–1200 |
+
+AI output is validated again by `content-script.js` before being applied.
+
+This version cannot use GenAI to:
+
+- rearrange arbitrary webpage elements
+- generate or execute JavaScript
+- inject arbitrary HTML or CSS
+- submit forms or perform account actions
+- access browser-internal pages
+
+## How the AI request works
+
+```text
+Prompt field
+    -> popup.js
+    -> service-worker.js
+    -> configured Chat Completions endpoint
+    -> JSON settings
+    -> content-script.js validation
+    -> webpage styles
+```
+
+The extension sends the user's request and the current PageFlow settings. It does not currently send the complete page HTML to the model.
+
+The model is instructed to return a JSON object. A typical response looks like:
 
 ```json
 {
@@ -36,18 +145,71 @@ The AI response should contain a JSON object such as:
 }
 ```
 
-Allowed fields and ranges are documented in the system prompt in `service-worker.js`. Values are validated again by `content-script.js` before being applied.
+## API key security
+
+Directly saving an API key in this extension is intended only for personal development.
+
+The current version stores the configuration in `chrome.storage.local`. The key is not automatically included when another person installs a separate copy of the extension, but it can be read by someone who has sufficient access to the same device, browser profile, or extension debugging tools.
+
+Before distributing the extension:
+
+- move the provider API key to your own backend proxy
+- authenticate extension users with your backend
+- add per-user quotas and rate limiting
+- use HTTPS
+- restrict backend CORS and extension origins
+- add usage monitoring, spend alerts, and a privacy policy
+- never hardcode a provider API key in extension source files
+
+## Troubleshooting
+
+### The popup displays Local rules
+
+No API endpoint is currently saved. Open **AI settings** and save the endpoint, model name, and development API key.
+
+### API request failed (401)
+
+The API key is missing, invalid, expired, or not authorized for the selected service.
+
+### API request failed (404)
+
+Check the API endpoint and model name. The configured model must be available from that endpoint.
+
+### API request failed (429)
+
+Check API billing, available credits, project limits, and rate limits.
+
+### The AI did not return valid settings
+
+The model response was not valid JSON in the format expected by `service-worker.js`. Try a simpler page-customization request or use a compatible model or proxy.
+
+### The page does not change
+
+- Confirm the active tab is a regular HTTP or HTTPS webpage.
+- Reload the extension.
+- Refresh the webpage.
+- Try one of the quick controls to verify the content script is connected.
 
 ## Project structure
 
 - `manifest.json`: extension metadata and permissions
-- `popup.*`: toolbar popup interface and interactions
-- `content-script.js`: page styling, state validation, and per-site storage
-- `service-worker.js`: AI service adapter
-- `options.*`: AI configuration page
+- `popup.html`, `popup.css`, `popup.js`: toolbar interface and interactions
+- `content-script.js`: page styling, validation, and per-site persistence
+- `service-worker.js`: local-rule and AI service adapter
+- `options.html`, `options.css`, `options.js`: AI configuration page
+- `PLANNING.md`: product roadmap, architecture, testing, and release plan
+- `icons/`: extension icons
+- `scripts/`: development utilities
+
+## Development roadmap
+
+See [PLANNING.md](./PLANNING.md) for the product scope, target backend architecture, delivery phases, testing plan, security requirements, risks, and definition of done.
 
 ## Before publishing
 
-- Authenticate through a backend proxy instead of distributing third-party API keys to clients.
-- Review website access permissions and prepare a privacy policy.
-- Test compatibility across common content sites, single-page applications, video sites, and high-contrast modes.
+- Replace direct provider access with an authenticated backend proxy.
+- Review website access permissions and Content Security Policy.
+- Test content sites, single-page applications, documentation, shopping, and video websites.
+- Complete keyboard, screen-reader, zoom, reduced-motion, and contrast testing.
+- Prepare a privacy policy, support documentation, store assets, and release notes.
+- Perform a security review and scan the package for credentials.
